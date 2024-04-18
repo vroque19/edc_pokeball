@@ -6,5 +6,5 @@ GOAL:<br>
 - Light up<br>
 - Make sound<br>
 
-![Alt Text](https://www.deviantart.com/pokewalker/art/PokeWalker-004Charmander-127729775)
+![Alt Text](https://search.brave.com/images?q=pokeball%20gif)
 
