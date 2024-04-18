@@ -73,7 +73,7 @@ def flash(outcome, color, pokemon):
 def get_pokemon():
     poke_map = {
         (64, 164, 223): "squirtle", # light blue
-        (51, 102, 49): "bulb", # bright green
+        (51, 102, 49): "bulbasaur", # bright green
         (255, 165, 0): "char" # orange
     }
     items = list(poke_map.items())
@@ -85,6 +85,7 @@ def flash_success(color, pokemon):
     print("successfully caught ", pokemon, "!\n")
     # play capture + success audio
     counter = 0
+    play_sound("capture_success")
     while counter < 5:
         time.sleep(0.2)
         pixels.fill((0, 255, 0)) # green
@@ -94,17 +95,18 @@ def flash_success(color, pokemon):
         pixels.show()
         counter += 1
     counter = 0
+    play_sound(pokemon)
     while counter < 1000:
         pixels.fill(color)
         pixels.show()
         counter += 1
     return
-    # play pokemon audio
 
 
 
 def flash_fail(pokemon):
     print("did not catch ", pokemon, "!\n")
+    play_sound("capture_fail")
     counter = 0
     #play the capture+fail sound
     while counter < 5:
@@ -116,13 +118,24 @@ def flash_fail(pokemon):
         pixels.show()
         counter += 1
 
+def play_sound(sound):
+    with open("audio/"+sound+".wav", 'rb') as wave_file:
+        print("\nplaying sound\n")
+        wav = audiocore.WaveFile(wave_file)
+        audio.play(wav)
+        while audio.playing:
+                pass
+        return
+#wave_file = open("daddys-home1.wav", "rb")
+#wav = audiocore.WaveFile(wave_file)
 
 while True:
     outcome = random.choice(["success", "fail"])
-    pixels.fill((0, 0, 0))
+    color, pokemon = get_pokemon()
+    pixels.fill((255, 255, 255))
     pixels.show()
     if not button.value:  # button pressed
-        color, pokemon = get_pokemon()
+        # play_sound(pokemon)
         print(color, pokemon)
         flash(outcome, color, pokemon)
 
