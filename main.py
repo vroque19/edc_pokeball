@@ -14,11 +14,13 @@ pixel_pin = board.D10
 # The number of NeoPixels
 num_pixels = 12
 ORDER = neopixel.GRB
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER)
+pixels = neopixel.NeoPixel(
+    pixel_pin, num_pixels, brightness=0.2, auto_write=False, pixel_order=ORDER
+)
 
 button = digitalio.DigitalInOut(board.A3)
 button.switch_to_input(pull=digitalio.Pull.UP)
-
+#speaker = audioio.AudioOut(board.A0)
 audio = audiobusio.I2SOut(board.A0, board.A1, board.A2)
 
 
@@ -53,23 +55,84 @@ def rainbow_cycle(wait):
         time.sleep(wait)
 
 
-counter = 0
+def flash(outcome, color, pokemon):
+    counter = 0
+    while counter < 3:
+        print("white")
+        pixels.fill((255, 255, 255))
+        pixels.show()
+        time.sleep(0.45)
+        pixels.fill((0, 0, 0))
+        pixels.show()
+        time.sleep(0.45)
+        counter += 1
+    if outcome == "success":
+        flash_success(color, pokemon)
+    else:
+        flash_fail(pokemon)
+
+def get_pokemon():
+    poke_map = {
+        (64, 164, 223): "squirtle", # light blue
+        (51, 102, 49): "bulb", # bright green
+        (255, 165, 0): "char" # orange
+    }
+    items = list(poke_map.items())
+    random_pokemon = random.choice(items)
+    return random_pokemon
+
+
+def flash_success(color, pokemon):
+    print("successfully caught ", pokemon, "!\n")
+    # play capture + success audio
+    counter = 0
+    while counter < 5:
+        time.sleep(0.2)
+        pixels.fill((0, 255, 0)) # green
+        pixels.show()
+        time.sleep(0.2)
+        pixels.fill((0, 0, 0))
+        pixels.show()
+        counter += 1
+    counter = 0
+    while counter < 1000:
+        pixels.fill(color)
+        pixels.show()
+        counter += 1
+    return
+    # play pokemon audio
+
+
+
+def flash_fail(pokemon):
+    print("did not catch ", pokemon, "!\n")
+    counter = 0
+    #play the capture+fail sound
+    while counter < 5:
+        time.sleep(0.5)
+        pixels.fill((255, 0, 0)) # red
+        pixels.show()
+        time.sleep(0.5)
+        pixels.fill((0, 0, 0))
+        pixels.show()
+        counter += 1
+
 
 while True:
-    if not button.value:
-        with open("daddys-home1.wav", "rb") as wave_file:
-            wav = audiocore.WaveFile(wave_file)
-            audio.play(wav)
-            while audio.playing:
-                pass
-        while counter < 3:
-            pixels.fill((255, 255, 255))
-            pixels.show()
-            time.sleep(0.1)
-            pixels.fill((0, 0, 0))
-            pixels.show()
-            time.sleep(0.1)
-            counter += 1
-    else:
-        pixels.fill((0, 255, 0))
+    with open("bulbasaur.wav", "rb") as wave_file:
+        wav = audiocore.WaveFile(wave_file)
+
+        print("Playing wav file!")
+        audio.play(wav)
+        while audio.playing:
+            pass
+
+    print("Done!")
+    outcome = random.choice(["success", "fail"])
+    pixels.fill((0, 0, 0))
     pixels.show()
+    if not button.value:  # button pressed
+        color, pokemon = get_pokemon()
+        print(color, pokemon)
+        flash(outcome, color, pokemon)
+
