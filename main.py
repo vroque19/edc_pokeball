@@ -20,7 +20,6 @@ pixels = neopixel.NeoPixel(
 
 button = digitalio.DigitalInOut(board.A3)
 button.switch_to_input(pull=digitalio.Pull.UP)
-#speaker = audioio.AudioOut(board.A0)
 audio = audiobusio.I2SOut(board.A0, board.A1, board.A2)
 
 
@@ -119,15 +118,6 @@ def flash_fail(pokemon):
 
 
 while True:
-    with open("bulbasaur.wav", "rb") as wave_file:
-        wav = audiocore.WaveFile(wave_file)
-
-        print("Playing wav file!")
-        audio.play(wav)
-        while audio.playing:
-            pass
-
-    print("Done!")
     outcome = random.choice(["success", "fail"])
     pixels.fill((0, 0, 0))
     pixels.show()
@@ -135,4 +125,5 @@ while True:
         color, pokemon = get_pokemon()
         print(color, pokemon)
         flash(outcome, color, pokemon)
+
 
